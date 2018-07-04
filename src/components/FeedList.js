@@ -7,19 +7,20 @@ require("react-bootstrap/lib/ModalHeader")
 //Feed con timeline de la aplicacion
 class FeedList extends Component {
 	constructor(props) {
-	super(props);
-	this.state = {
-	feed : null ,
-	tipo : 'public',
-	showModal : false,
+		super(props);
+		this.state = {
+			feed : null ,
+			tipo : 'public',
+			showModal : false,
 
-	edit_texto :'',
-	edit_tipo :'',
-	edit_id :'',
-	} ;
+			edit_texto :'',
+			edit_tipo :'',
+			edit_id :'',
+		} ;
 	}
+
 	componentDidMount(){
-	this.updateFeed();
+		this.updateFeed();
 	}
 
 	updateFeed(){
