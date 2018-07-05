@@ -4,8 +4,8 @@ import { Panel, Button, Modal, Well, Badge } from 'react-bootstrap';
 import FeedForm from './FeedForm';
 require("react-bootstrap/lib/ModalHeader")
 
-//Feed con timeline de la aplicacion
 class FeedList extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -23,11 +23,17 @@ class FeedList extends Component {
 		this.updateFeed();
 	}
 
+	setTipo(tipo){
+		this.setState({tipo},() => this.updateFeed());
+	}
+
 	updateFeed(){
 		dbFeed
 			.where('type','==',this.state.tipo)
 			.onSnapshot(items => {
-				const feed = items.docs.map(doc =>doc.data());
+				const feed = items.docs.map(
+					doc =>doc.data()
+				);
 				this.setState({feed});
 			});
 	}
@@ -46,62 +52,61 @@ class FeedList extends Component {
 	}
 
 	render() {return (
-	<div>
-		<Modal show={this.state.showModal}>
-			<Modal.Header onHide={() => this.handleClose()} closeButton>
-				<Modal.Title>Editar</Modal.Title>
-			</Modal.Header>
-			<Modal.Body>
-				{
-					this.state.showModal?
-					<FeedForm
-						onTextPublished={() => this.handleClose()}
-						texto={this.state.edit_texto}
-						id_post={this.state.edit_id}
-						tipo={this.state.edit_tipo} />
-					:null
-				}
-			</Modal.Body>
-		</Modal>
+		<div>
+			<Modal show={this.state.showModal}>
+				<Modal.Header onHide={() => this.handleClose()} closeButton>
+					<Modal.Title>Editar</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					{this.state.showModal?<FeedForm onTextPublished={() => this.handleClose()} texto={this.state.edit_texto} id_post={this.state.edit_id} tipo={this.state.edit_tipo} />:null}
+				</Modal.Body>
+			</Modal>
 
-		<Button
-			bsSize="xsmall"
-			onClick={() => {this.setState({tipo : 'public'}); this.updateFeed(); }}
-			>Público</Button>
+			<Button
+				bsSize="xsmall"
+				onClick={() => {this.setTipo('public'); }}
+				>Público
+			</Button>
 
-		<Button
-			bsSize="xsmall"
-			onClick={() => {this.setState({tipo : 'friends'}); this.updateFeed(); }}
-			>Amigos</Button>
+			<Button
+				bsSize="xsmall"
+				onClick={() => {this.setTipo('friends'); }}
+				>Amigos
+			</Button>
 
-		{this.state.feed && this.state.feed.map((item,index) => {return (
-			<Panel key={index} >
-				<Panel.Body>
-					<Well>{item.text}</Well>
-				</Panel.Body>
-				<Panel.Footer>
-					<Button
-						bsSize="xsmall"
-						onClick={() => this.handleShow(item.id,item.text,item.type)}
-						>editar</Button>
-
-					<Button
-						bsSize="xsmall"
-						onClick={() => {
-								if(window.confirm('¿Estás seguro que quieres eliminar este post?')){
-									dbFeed
-										.doc(item.id)
-										.delete()
+			{
+				this.state.feed && this.state.feed.map((item,index) => {return (
+					<Panel key={index} >
+						<Panel.Body>
+							<Well>{item.text}</Well>
+						</Panel.Body>
+						<Panel.Footer>
+							<Button
+								bsSize="xsmall"
+								onClick={() =>
+									this.handleShow(item.id,item.text,item.type)
 								}
-							}
-						}
-						>eliminar</Button>
-
-					<Badge>{item.type==="public"?"Público":"Amigos"}</Badge>
-				</Panel.Footer>
-			</Panel>
-		)})}
-	</div>
-	)}
+								>editar
+							</Button>
+							<Button
+								bsSize="xsmall"
+								onClick={() => {
+										if(window.confirm('¿Estás seguro que quieres eliminar este post?')){
+											dbFeed
+												.doc(item.id)
+												.delete()
+										}
+									}
+								}
+								>eliminar
+							</Button>
+							<Badge>{item.type==="public"?"Público":"Amigos"}</Badge>
+						</Panel.Footer>
+					</Panel>
+				)})
+			}
+		  </div>
+	  )
+	}
 }
 export default FeedList;
